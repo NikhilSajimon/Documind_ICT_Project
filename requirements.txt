@@ -1,0 +1,19 @@
+# Flask and Server
+flask
+gunicorn
+werkzeug
+
+# ML/AI
+torch
+transformers
+evaluate
+seqeval
+
+# Data/Image Processing
+pandas
+numpy
+Pillow
+pdf2image
+
+# OCR Engine
+pytesseract

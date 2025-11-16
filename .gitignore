@@ -1,0 +1,34 @@
+# Virtual Environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Local system files (macOS/Windows)
+.DS_Store
+Thumbs.db
+
+# IDE/Editor configuration files
+.vscode/
+.idea/
+
+# --- Project-Specific ---
+
+# 1. Ignore all raw data
+data/raw/
+
+# 2. Ignore the large trained models
+models/
+
+# 3. Ignore the temp folder for the deployed app
+uploads/
+
+# 4. Ignore any processed data files
+*.pkl
+
+# 5. Ignore other git/gcloud files
+.git
+.gcloudignore
+.dockerignore

@@ -1,0 +1,479 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DocuMind AI</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 2em; background: #f9f9f9; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { color: #333; }
+        #uploadButton { background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        #uploadButton:hover { background: #0056b3; }
+        #results { background: #2b2b2b; color: #f1f1f1; padding: 1em; border-radius: 5px; margin-top: 1em; white-space: pre-wrap; word-wrap: break-word; }
+        #spinner { display: none; margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DocuMind: Document Extractor 📄</h1>
+        <p>Upload a .png, .jpg, or .pdf file to extract structured data.</p>
+        
+        <input type="file" id="fileInput" accept=".png, .jpg, .jpeg, .pdf" />
+        <button id="uploadButton">Extract Data</button>
+        
+        <div id="spinner">Processing... this may take a moment.</div>
+        
+        <h3>Results:</h3>
+        <pre id="results">Waiting for file...</pre>
+    </div>
+
+    <script>
+        document.getElementById('uploadButton').onclick = async () => {
+            const fileInput = document.getElementById('fileInput');
+            const resultsEl = document.getElementById('results');
+            const spinnerEl = document.getElementById('spinner');
+
+            if (fileInput.files.length === 0) {
+                resultsEl.textContent = "Please select a file first.";
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            resultsEl.textContent = "Uploading and processing... this may take a moment.";
+            spinnerEl.style.display = 'block';
+
+            try {
+                // This JavaScript sends the file to your Flask API endpoint
+                const response = await fetch('/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const results = await response.json();
+                
+                // Display the JSON results nicely formatted
+                resultsEl.textContent = JSON.stringify(results, null, 4);
+
+            } catch (error) {
+                resultsEl.textContent = "An error occurred: " + error;
+            } finally {
+                spinnerEl.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DocuMind: Intelligent Document Processing</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Book Theme Color Palette --- */
+        :root {
+            --bg-color: #fdfaf6;       /* Old Parchment */
+            --text-color: #5d4037;    /* Sepia / Dark Brown Ink */
+            --headline-color: #3e2723; /* Darker Ink */
+            --border-color: #d7ccc8;   /* Light Sepia */
+            --card-bg: #ffffff;
+            --button-bg: #6d4c41;    /* Leather Brown */
+            --button-text: #ffffff;
+            --button-hover: #4e342e;
+            --pre-bg: #fafafa;       /* Light paper for code */
+            --pre-text: #333;
+            --pre-border: #e0e0e0;
+            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        body.dark-mode {
+            --bg-color: #261F1D;       /* Dark Walnut */
+            --text-color: #bcaaa4;    /* Light Sepia */
+            --headline-color: #eceff1; /* White Paper */
+            --border-color: #4e342e;   /* Dark Brown */
+            --card-bg: #3e2723;       /* Dark Leather */
+            --button-bg: #a1887f;    /* Light Brown */
+            --button-text: #261F1D;
+            --button-hover: #eceff1;
+            --pre-bg: #1e1e1e;
+            --pre-text: #f1f1f1;
+            --pre-border: #4e342e;
+            --shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            margin: 0;
+            padding: 2em;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 18px;
+            line-height: 1.8;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px; /* Centered, single-column layout */
+            margin: 0 auto;
+        }
+
+        /* --- Header Styling (Title & Toggle) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1em;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 2.5em;
+            transition: border-color 0.3s;
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.2em;
+            color: var(--headline-color);
+            margin: 0;
+            font-weight: 900;
+            transition: color 0.3s;
+        }
+        
+        h1 span {
+            font-family: 'Lora', serif;
+            font-size: 0.6em;
+            font-weight: 400;
+            color: var(--text-color);
+            margin-left: 10px;
+            font-style: italic;
+            transition: color 0.3s;
+        }
+        
+        h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.6em;
+            color: var(--headline-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            font-weight: 700;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        p { font-size: 1.1em; }
+        
+        /* --- Section Styling (Stacked Layout) --- */
+        .card-section {
+            background: var(--card-bg);
+            padding: 2em 2.5em;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .results-section {
+            margin-top: 2.5em; 
+            display: none; 
+        }
+
+        /* --- File Input Styling --- */
+        #fileInput { display: none; }
+        
+        .file-label {
+            background-color: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2em;
+            text-align: center;
+            cursor: pointer;
+            display: block;
+            margin-bottom: 1.5em;
+            transition: all 0.3s ease-in-out;
+            position: relative; 
+            overflow: hidden;
+        }
+        
+        .file-label:before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 8px;
+            padding: 2px; 
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .file-label:hover:before {
+            opacity: 1;
+        }
+        .file-label:hover {
+            border-color: transparent; 
+        }
+        
+        #file-name {
+            color: var(--text-color);
+            font-weight: 500;
+            margin-top: 1em;
+            font-size: 0.95em;
+            font-style: italic;
+            transition: color 0.3s;
+        }
+
+        /* --- Button Styling --- */
+        .button-group { display: flex; gap: 10px; }
+        
+        button {
+            padding: 12px 20px;
+            border: 1px solid var(--button-bg);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Lora', serif;
+            transition: all 0.2s ease;
+        }
+
+        #uploadButton {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+        #uploadButton:hover { 
+            background: var(--button-hover);
+            border-color: var(--button-hover);
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        #downloadButton {
+            background: #28a745; 
+            color: white;
+            border-color: #28a745;
+            display: none; 
+        }
+        #downloadButton:hover { 
+            background: #218838; 
+            border-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* --- Results Styling --- */
+        #results {
+            background: var(--pre-bg);
+            color: var(--pre-text);
+            padding: 1.5em;
+            margin-top: 1.5em;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.7;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--pre-border);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #spinner { display: none; margin-top: 1.5em; font-weight: 500; font-style: italic; }
+        
+        /* --- Dark Mode Toggle Button --- */
+        #themeToggle {
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            line-height: 30px;
+            text-align: center;
+            transition: background-color 0.2s, color 0.3s;
+            color: var(--headline-color);
+        }
+        #themeToggle:hover {
+            background-color: var(--border-color);
+        }
+
+        /* --- NEW: Acknowledgement Footer --- */
+        .page-footer {
+            text-align: center;
+            margin-top: 4em;
+            padding-top: 2em;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 0.85em; /* "tiny" font */
+            opacity: 0.7; /* Unobtrusive */
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .page-footer p {
+            margin: 0.5em 0;
+            font-size: 1em; /* Inherits 0.85em from parent */
+        }
+        /* ---------------------------------- */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DocuMind <span>Intelligent Document Processing</span></h1>
+            
+            <button id="themeToggle">🌙</button>
+        </header>
+        
+        <div class="card-section upload-section">
+            <h2>Submit Your Document</h2>
+            <p>Upload a .png, .jpg, or .pdf. Our AI will analyze the layout to find all relevant key-value pairs and tagged entities.</p>
+            
+            <label for="fileInput" class="file-label" id="file-label">
+                <span style="position: relative; z-index: 2;">
+                    Click or Drag & Drop File Here
+                    <div id="file-name">No file selected</div>
+                </span>
+            </label>
+            <input type="file" id="fileInput" accept=".png, .jpg, .jpeg, .pdf" />
+            
+            <div class="button-group">
+                <button id="uploadButton">Extract Data</button>
+            </div>
+        </div>
+        
+        <div class="card-section results-section" id="results-section">
+            <h2>Extracted Data</h2>
+            
+            <div class="button-group">
+                <button id="downloadButton">Download JSON</button>
+            </div>
+
+            <div id="spinner">Processing... this may take a moment.</div>
+            
+            <pre id="results">Waiting for file...</pre>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>Data Science Project: Team 5</p>
+        <p>Nikhil Saji | Sreesanth R Nair | Sandra M S | Ajeeshnath</p>
+    </footer>
+    <script>
+        // Get all element references
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const resultsEl = document.getElementById('results');
+        const spinnerEl = document.getElementById('spinner');
+        const fileNameEl = document.getElementById('file-name');
+        const fileLabelEl = document.getElementById('file-label');
+        const toggleButton = document.getElementById('themeToggle');
+        const resultsSection = document.getElementById('results-section'); 
+
+        // --- DARK MODE LOGIC ---
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggleButton.textContent = '☀️';
+        } else {
+            toggleButton.textContent = '🌙';
+        }
+
+        toggleButton.onclick = () => {
+            if (document.body.classList.contains('dark-mode')) {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                toggleButton.textContent = '🌙';
+            } else {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                toggleButton.textContent = '☀️';
+            }
+        };
+
+        // --- FILE NAME LOGIC ---
+        fileInput.onchange = () => {
+            if (fileInput.files.length > 0) {
+                fileNameEl.textContent = fileInput.files[0].name;
+                fileLabelEl.style.borderColor = 'var(--button-bg)';
+            } else {
+                fileNameEl.textContent = 'No file selected';
+                fileLabelEl.style.borderColor = 'var(--border-color)';
+            }
+            resultsSection.style.display = 'none';
+            downloadButton.style.display = 'none';
+        };
+
+        // --- UPLOAD BUTTON LOGIC ---
+        uploadButton.onclick = async () => {
+            if (fileInput.files.length === 0) {
+                resultsSection.style.display = 'block';
+                resultsEl.textContent = "Please select a file first.";
+                resultsEl.style.opacity = 1;
+                resultsSection.scrollIntoView({ behavior: 'smooth' }); // Scroll to error
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            resultsSection.style.display = 'block';
+            resultsEl.textContent = "Uploading and processing... this may take a moment.";
+            resultsEl.style.opacity = 1; 
+            spinnerEl.style.display = 'block';
+            downloadButton.style.display = 'none';
+
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            try {
+                const response = await fetch('/api/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const results = await response.json();
+                
+                resultsEl.textContent = JSON.stringify(results, null, 4);
+                downloadButton.style.display = 'inline-block'; 
+
+            } catch (error) {
+                resultsEl.textContent = "An error occurred: " + error;
+            } finally {
+                spinnerEl.style.display = 'none';
+            }
+        };
+
+        // --- DOWNLOAD BUTTON LOGIC ---
+        downloadButton.onclick = () => {
+            const jsonData = resultsEl.textContent;
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const originalFilename = fileInput.files[0]?.name.split('.')[0] || 'results';
+            
+            downloadFile(url, `${originalFilename}_extraction.json`);
+            URL.revokeObjectURL(url);
+        };
+
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a); 
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
